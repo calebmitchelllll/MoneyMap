@@ -1,42 +1,71 @@
-from flask import Flask, request, jsonify
-from flask_cors import CORS
+# Main FastAPI backend file
 
-from financial_logic import build_financial_plan
-from simulation import run_simulation
-from ai_summary import generate_summary
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+import sys
+import os
 
-app = Flask(__name__)
-CORS(app)
+from financial_logic import generate_strategies
+from simulation import run_all_simulations
 
+# Let Python find the ai folder one level above backend
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from ai.ai_summary import generate_summary
 
-@app.route("/")
-def home():
-    return jsonify({"message": "WealthSim backend is running"})
+app = FastAPI()
 
+# Allow the frontend to talk to this backend
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-@app.route("/simulate", methods=["POST"])
-def simulate():
-    try:
-        data = request.get_json()
+# This matches your frontend field names exactly
+class UserInput(BaseModel):
+    savings: float
+    income: float
+    expenses: float
+    investment: float
+    risk: str
+    timeline: int
 
-        if not data:
-            return jsonify({"error": "No input data provided"}), 400
+@app.get("/")
+def root():
+    return {"message": "WealthSim backend is running"}
 
+@app.post("/simulate")
+def simulate(user_input: UserInput):
+    # Build strategy info and emergency fund info
+    financial_data = generate_strategies(
+        savings=user_input.savings,
+        monthly_income=user_input.income,
+        monthly_expenses=user_input.expenses,
+        monthly_investment=user_input.investment,
+        risk_tolerance=user_input.risk
+    )
 
-        # Example data flow.
-        plan = build_financial_plan(data)
-        simulation_results = run_simulation(plan)
-        summary = generate_summary(plan, simulation_results)
+    # Run the simulation using monthly investment as the recurring contribution
+    simulation_results = run_all_simulations(
+        initial_amount=user_input.savings,
+        monthly_contribution=user_input.investment,
+        years=user_input.timeline,
+        strategies=financial_data["strategies"]
+    )
 
-        return jsonify({
-            "plan": plan,
-            "simulation": simulation_results,
-            "summary": summary
-        })
+    # Generate summary text
+    summary = generate_summary(
+        user_data=user_input.model_dump(),
+        strategy_results=simulation_results,
+        emergency_fund_gap=financial_data["emergency_fund_gap"]
+    )
 
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
-if __name__ == "__main__":
-    app.run(debug=True, host="127.0.0.1", port=5000)
+    return {
+        "emergency_fund_target": financial_data["emergency_fund_target"],
+        "emergency_fund_gap": financial_data["emergency_fund_gap"],
+        "strategy_results": simulation_results,
+        "summary": summary
+    }

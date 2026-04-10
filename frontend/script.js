@@ -1,13 +1,28 @@
-document.getElementById("runBtn").addEventListener("click", () => {
+document.getElementById("runBtn").addEventListener("click", async () => {
   const data = {
-    savings: document.getElementById("savings").value,
-    income: document.getElementById("income").value,
-    expenses: document.getElementById("expenses").value,
-    investment: document.getElementById("investment").value,
+    savings: Number(document.getElementById("savings").value),
+    income: Number(document.getElementById("income").value),
+    expenses: Number(document.getElementById("expenses").value),
+    investment: Number(document.getElementById("investment").value),
     risk: document.getElementById("risk").value,
-    timeline: document.getElementById("timeline").value
+    timeline: Number(document.getElementById("timeline").value)
   };
 
-  document.getElementById("results").textContent =
-    JSON.stringify(data, null, 2);
+  try {
+    const response = await fetch("http://127.0.0.1:8000/simulate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    });
+
+    const result = await response.json();
+
+    document.getElementById("results").textContent =
+      JSON.stringify(result, null, 2);
+  } catch (error) {
+    document.getElementById("results").textContent =
+      "Error connecting to backend: " + error.message;
+  }
 });
