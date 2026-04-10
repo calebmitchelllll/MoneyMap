@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WealthSim</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>WealthSim</h1>
+        <p class="subtitle">Simulate your financial future</p>
+
+        <div class="card">
+            <h2>Your Info</h2>
+
+            <div class="form-group">
+                <label>Savings ($)</label>
+                <input type="number" id="savings" placeholder="8000" />
+            </div>
+
+            <div class="form-group">
+                <label>Monthly Income ($)</label>
+                <input type="number" id="income" placeholder="4500" />
+            </div>
+
+            <div class="form-group">
+                <label>Monthly Expenses ($)</label>
+                <input type="number" id="expenses" placeholder="3200" />
+            </div>
+
+            <div class="form-group">
+                <label>Monthly Investment ($)</label>
+                <input type="number" id="investment" placeholder="500" />
+            </div>
+
+            <div class="form-group">
+                <label>Risk Tolerance</label>
+                <select id="risk">
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Timeline (years)</label>
+                <input type="number" id="timeline" placeholder="10" />
+            </div>
+
+            <button id="runBtn">Run Simulation</button>
+        </div>
+
+        <div class="card">
+            <h2>Results</h2>
+            <pre id="results">No results yet.</pre>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
