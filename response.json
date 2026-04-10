@@ -1,0 +1,25 @@
+{
+  "plan": {
+    "monthly_surplus": 1300,
+    "monthly_investment": 500,
+    "timeline": 10
+  },
+  "simulation": [
+    {
+      "strategy": "Conservative",
+      "annual_return": 0.04,
+      "final_balance": 91852.43
+    },
+    {
+      "strategy": "Balanced",
+      "annual_return": 0.06,
+      "final_balance": 104512.88
+    },
+    {
+      "strategy": "Growth",
+      "annual_return": 0.08,
+      "final_balance": 121903.77
+    }
+  ],
+  "summary": "Over 10 years, the Growth strategy produced the highest return but comes with higher risk, while the Conservative strategy grows slower but is more stable."
+}
